@@ -14,15 +14,41 @@ function App() {
   const [activeTab, setActiveTab] = useState('stock'); // default tab
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // Auth Listener
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        setRole('ADMIN');
+      }
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        setRole('ADMIN');
+      } else {
+        const currentRole = localStorage.getItem('nkstore-role');
+        if (currentRole === 'ADMIN') {
+          setRole(null);
+          localStorage.removeItem('nkstore-role');
+        }
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   // Load Data
   const loadData = async () => {
     if (!role) return;
     setLoading(true);
     
     // Fetch Lots & Models
+    const modelColumns = role === 'ADMIN' ? '*' : 'id, lot_id, name, quantity, sold_quantity, sell_price';
     const { data: lotsData, error: lotsError } = await supabase
       .from('lots')
-      .select('*, models(*)');
+      .select(`*, models(${modelColumns})`);
       
     if (lotsData) {
       setLots(lotsData);
@@ -87,19 +113,24 @@ function App() {
             <p style={{fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '1rem'}}>Accès complet (Bénéfices, Dépenses, Historique).</p>
             <input 
               type="password" 
-              placeholder="Code PIN Secret" 
+              placeholder="Code PIN / Mot de passe" 
               value={pin} 
               onChange={(e) => setPin(e.target.value)}
               style={{width: '100%', padding: '0.75rem', marginBottom: '1rem', textAlign: 'center', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--surface-border)', color: 'white', borderRadius: '0.5rem'}}
             />
             <button 
-              onClick={() => {
-                if(pin === 'nkstore@2025.tris@') { 
+              onClick={async () => {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                  email: 'tristannkoghe7@gmail.com',
+                  password: pin
+                });
+                
+                if (error) {
+                  alert('Mot de passe incorrect !');
+                } else {
                   setRole('ADMIN'); 
                   localStorage.setItem('nkstore-role', 'ADMIN'); 
                   setActiveTab('dashboard');
-                } else { 
-                  alert('Code PIN incorrect !'); 
                 }
               }}
               style={{width: '100%', padding: '1rem', background: 'var(--danger-color)', color: 'white', border: 'none', borderRadius: '0.5rem', cursor: 'pointer', fontWeight: 'bold'}}
@@ -114,7 +145,10 @@ function App() {
 
   const formatFCFA = (amount) => Math.round(amount).toLocaleString('fr-FR') + ' FCFA';
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    if (role === 'ADMIN') {
+      await supabase.auth.signOut();
+    }
     setRole(null);
     setPin('');
     localStorage.removeItem('nkstore-role');
@@ -174,8 +208,14 @@ function App() {
     if (newSold > maxQty) newSold = maxQty;
     if (newSold === currentSold) return;
 
-    // Update DB optimistically? We'll just wait
-    await supabase.from('models').update({ sold_quantity: newSold }).eq('id', modelId);
+    // Update DB securely via RPC
+    const { error } = await supabase.rpc('increment_sold_quantity', { row_id: modelId, val: change });
+    
+    if (error) {
+      console.error(error);
+      alert("Erreur lors de la mise à jour du stock.");
+      return;
+    }
     
     const actionDesc = change > 0 
       ? `Vente : 1x ${modelName} (${lotName})`
