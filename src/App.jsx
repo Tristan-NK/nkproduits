@@ -12,6 +12,7 @@ function App() {
   const [loading, setLoading] = useState(false);
 
   const [activeTab, setActiveTab] = useState('stock'); // default tab
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Load Data
   const loadData = async () => {
@@ -254,8 +255,23 @@ function App() {
 
   return (
     <div className="app-layout">
+      {/* MOBILE HEADER */}
+      <div className="mobile-header no-print">
+        <button className="hamburger-btn" onClick={() => setIsMobileMenuOpen(true)}>☰</button>
+        <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end'}}>
+          <span className="mobile-brand" style={{fontSize: '1.2rem', fontWeight: 'bold'}}>NK'<span style={{color:'var(--accent-color)'}}>STORE</span></span>
+          <span style={{fontSize: '0.75rem', color: role === 'ADMIN' ? 'var(--danger-color)' : 'var(--text-secondary)'}}>
+            {role === 'ADMIN' ? 'Admin 👑' : 'Vendeuse 👩‍💼'}
+          </span>
+        </div>
+      </div>
+
+      {/* OVERLAY FOR MOBILE */}
+      {isMobileMenuOpen && <div className="sidebar-overlay" onClick={() => setIsMobileMenuOpen(false)}></div>}
+
       {/* SIDEBAR */}
-      <nav className="sidebar no-print">
+      <nav className={`sidebar no-print ${isMobileMenuOpen ? 'open' : ''}`}>
+        <button className="close-sidebar-btn" onClick={() => setIsMobileMenuOpen(false)}>✕</button>
         <div className="brand" style={{display: 'flex', flexDirection: 'column'}}>
           <span>NK'<span style={{color:'var(--accent-color)'}}>STORE</span></span>
           <span style={{fontSize: '0.8rem', color: role === 'ADMIN' ? 'var(--danger-color)' : 'var(--text-secondary)', fontWeight: 'normal', marginTop:'5px'}}>
@@ -264,28 +280,28 @@ function App() {
         </div>
         <ul>
           {role === 'ADMIN' && (
-            <li className={activeTab === 'dashboard' ? 'active' : ''} onClick={() => setActiveTab('dashboard')}>
+            <li className={activeTab === 'dashboard' ? 'active' : ''} onClick={() => { setActiveTab('dashboard'); setIsMobileMenuOpen(false); }}>
               📊 Tableau de Bord
             </li>
           )}
-          <li className={activeTab === 'stock' ? 'active' : ''} onClick={() => setActiveTab('stock')}>
+          <li className={activeTab === 'stock' ? 'active' : ''} onClick={() => { setActiveTab('stock'); setIsMobileMenuOpen(false); }}>
             🛒 Gérer le Stock
           </li>
-          <li className={activeTab === 'add-lot' ? 'active' : ''} onClick={() => setActiveTab('add-lot')}>
+          <li className={activeTab === 'add-lot' ? 'active' : ''} onClick={() => { setActiveTab('add-lot'); setIsMobileMenuOpen(false); }}>
             📦 Nouvel Arrivage
           </li>
           {role === 'ADMIN' && (
-            <li className={activeTab === 'expenses' ? 'active' : ''} onClick={() => setActiveTab('expenses')}>
+            <li className={activeTab === 'expenses' ? 'active' : ''} onClick={() => { setActiveTab('expenses'); setIsMobileMenuOpen(false); }}>
               💸 Gérer les Dépenses
             </li>
           )}
           {role === 'ADMIN' && (
-            <li className={activeTab === 'buy-prices' ? 'active' : ''} onClick={() => setActiveTab('buy-prices')}>
+            <li className={activeTab === 'buy-prices' ? 'active' : ''} onClick={() => { setActiveTab('buy-prices'); setIsMobileMenuOpen(false); }}>
               🏷️ Prix d'Achat (Chine)
             </li>
           )}
           {role === 'ADMIN' && (
-            <li className={activeTab === 'logs' ? 'active' : ''} onClick={() => setActiveTab('logs')}>
+            <li className={activeTab === 'logs' ? 'active' : ''} onClick={() => { setActiveTab('logs'); setIsMobileMenuOpen(false); }}>
               📝 Historique (Logs)
             </li>
           )}
