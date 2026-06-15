@@ -457,19 +457,27 @@ function App() {
                         </td>
                         <td style={{textAlign: 'center', color: 'var(--success-color)', fontWeight: 'bold'}}>{formatFCFA(model.sell_price)}</td>
                         <td style={{textAlign: 'center'}}>
-                          <div style={{display: 'flex', justifyContent: 'center', gap: '1rem'}}>
+                          <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', background: 'rgba(0,0,0,0.2)', padding: '0.25rem', borderRadius: '2rem', width: 'fit-content', margin: '0 auto', border: '1px solid var(--surface-border)'}}>
+                            <button 
+                              onClick={() => updateStock(selectedStockLotId, model.id, model.name, lots.find(l => l.id === selectedStockLotId).name, model.sold_quantity, model.quantity, -1)}
+                              disabled={model.sold_quantity === 0}
+                              style={{width: '32px', height: '32px', borderRadius: '50%', background: model.sold_quantity === 0 ? 'transparent' : 'var(--danger-color)', border: 'none', color: model.sold_quantity === 0 ? 'var(--text-secondary)' : 'white', cursor: model.sold_quantity === 0 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '1.2rem', transition: '0.2s'}}
+                            >
+                              −
+                            </button>
+                            
+                            <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', width: '50px'}}>
+                              <span style={{fontWeight: 'bold', fontSize: '1.1rem', lineHeight: '1'}}>{model.sold_quantity}</span>
+                              <span style={{fontSize: '0.65rem', color: 'var(--text-secondary)', textTransform: 'uppercase'}}>Vendus</span>
+                            </div>
+
                             <button 
                               onClick={() => updateStock(selectedStockLotId, model.id, model.name, lots.find(l => l.id === selectedStockLotId).name, model.sold_quantity, model.quantity, 1)}
                               disabled={remain === 0}
-                              style={{padding: '0.75rem', background: remain===0?'rgba(255,255,255,0.1)':'var(--accent-color)', border: 'none', color: 'white', borderRadius: '0.5rem', cursor: remain===0?'not-allowed':'pointer', fontWeight: 'bold'}}
+                              style={{width: '32px', height: '32px', borderRadius: '50%', background: remain === 0 ? 'transparent' : 'var(--success-color)', border: 'none', color: remain === 0 ? 'var(--text-secondary)' : 'white', cursor: remain === 0 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '1.2rem', transition: '0.2s'}}
                             >
-                              🛒 +1 Vente
+                              +
                             </button>
-                            {model.sold_quantity > 0 && (
-                              <button onClick={() => updateStock(selectedStockLotId, model.id, model.name, lots.find(l => l.id === selectedStockLotId).name, model.sold_quantity, model.quantity, -1)} style={{padding: '0.5rem', background: 'transparent', border: '1px solid var(--danger-color)', color: 'var(--danger-color)', borderRadius: '0.25rem', cursor: 'pointer'}}>
-                                Annuler (-1)
-                              </button>
-                            )}
                           </div>
                         </td>
                       </tr>
