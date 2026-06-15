@@ -5,7 +5,7 @@ import './App.css';
 
 function App() {
   const [role, setRole] = useState(localStorage.getItem('nkstore-role') || null);
-  const [adminEmail, setAdminEmail] = useState('tristannkoghe7@gmail.com');
+  const [adminEmail, setAdminEmail] = useState('');
   const [pin, setPin] = useState('');
   
   const [lots, setLots] = useState([]);
