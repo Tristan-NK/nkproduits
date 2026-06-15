@@ -12,7 +12,7 @@ function App() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const [activeTab, setActiveTab] = useState('stock'); // default tab
+  const [activeTab, setActiveTab] = useState('catalogue'); // default tab
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // --- HORS-LOGIN STATES ---
@@ -110,7 +110,7 @@ function App() {
             <h2>👩‍💼 Vendeuse</h2>
             <p style={{fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '2rem'}}>Accès limité à la gestion du stock et aux nouveaux arrivages.</p>
             <button 
-              onClick={() => { setRole('VENDEUSE'); localStorage.setItem('nkstore-role', 'VENDEUSE'); setActiveTab('stock'); }}
+              onClick={() => { setRole('VENDEUSE'); localStorage.setItem('nkstore-role', 'VENDEUSE'); setActiveTab('catalogue'); }}
               style={{width: '100%', padding: '1rem', background: 'var(--accent-color)', color: 'white', border: 'none', borderRadius: '0.5rem', cursor: 'pointer', fontWeight: 'bold'}}
             >
               Connexion Libre
@@ -331,8 +331,11 @@ function App() {
               📊 Tableau de Bord
             </li>
           )}
+          <li className={activeTab === 'catalogue' ? 'active' : ''} onClick={() => { setActiveTab('catalogue'); setIsMobileMenuOpen(false); }}>
+            📖 Catalogue & Inventaire
+          </li>
           <li className={activeTab === 'stock' ? 'active' : ''} onClick={() => { setActiveTab('stock'); setIsMobileMenuOpen(false); }}>
-            🛒 Gérer le Stock
+            🛒 Vente & Caisse
           </li>
           <li className={activeTab === 'add-lot' ? 'active' : ''} onClick={() => { setActiveTab('add-lot'); setIsMobileMenuOpen(false); }}>
             📦 Nouvel Arrivage
@@ -421,10 +424,45 @@ function App() {
           </div>
         )}
 
+        {/* --- VUE: CATALOGUE (VENDEUSE + ADMIN) --- */}
+        <div className={`view-section ${activeTab !== 'catalogue' ? 'hidden-screen' : ''}`}>
+          <header style={{marginBottom: '2rem'}}>
+            <h1 style={{margin: 0}}>Catalogue & Inventaire</h1>
+            <p style={{color: 'var(--text-secondary)'}}>Consultez l'ensemble de vos articles et leur disponibilité.</p>
+          </header>
+
+          <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem'}}>
+            {lots.map(lot => (
+              <div key={lot.id} className="glass-panel" style={{display: 'flex', flexDirection: 'column', gap: '1rem', borderTop: '4px solid var(--accent-color)'}}>
+                <h2 style={{margin: 0, color: 'white', fontSize: '1.25rem'}}>{lot.name}</h2>
+                <div style={{display: 'flex', flexDirection: 'column', gap: '0.75rem'}}>
+                  {lot.models?.map(model => {
+                    const remain = model.quantity - model.sold_quantity;
+                    return (
+                      <div key={model.id} style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.05)', padding: '0.75rem', borderRadius: '0.5rem'}}>
+                        <div>
+                          <strong style={{color: 'white', display: 'block'}}>{model.name}</strong>
+                          <span style={{color: 'var(--success-color)', fontWeight: 'bold'}}>{formatFCFA(model.sell_price)}</span>
+                        </div>
+                        <div style={{textAlign: 'right'}}>
+                          <span style={{display: 'inline-block', padding: '0.25rem 0.5rem', borderRadius: '0.25rem', fontSize: '0.8rem', fontWeight: 'bold', background: remain > 0 ? 'var(--success-color)' : 'var(--danger-color)', color: 'white'}}>
+                            {remain > 0 ? `${remain} en stock` : 'Rupture'}
+                          </span>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
+            {lots.length === 0 && <p style={{color: 'white'}}>Aucun article dans le catalogue pour le moment.</p>}
+          </div>
+        </div>
+
         {/* --- VUE: GESTION STOCK (ADMIN + VENDEUSE) --- */}
         <div className={`view-section ${activeTab !== 'stock' ? 'hidden-screen' : ''}`}>
           <header style={{marginBottom: '2rem'}}>
-            <h1 style={{margin: 0}}>Gestion du Stock & Ventes</h1>
+            <h1 style={{margin: 0}}>Vente & Caisse</h1>
             <p style={{color: 'var(--text-secondary)'}}>Enregistrez les ventes au quotidien.</p>
           </header>
 
