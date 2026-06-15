@@ -291,7 +291,7 @@ function App() {
           )}
         </ul>
 
-        <button onClick={handleLogout} style={{marginTop: 'auto', background: 'transparent', border: '1px solid var(--danger-color)', color: 'var(--danger-color)', padding: '0.75rem', borderRadius: '0.5rem', cursor: 'pointer', fontWeight: 'bold'}}>
+        <button className="logout-btn" onClick={handleLogout}>
           Déconnexion
         </button>
       </nav>

@@ -160,6 +160,17 @@ h2 {
   display: none;
 }
 
+.logout-btn {
+  margin-top: auto;
+  background: transparent;
+  border: 1px solid var(--danger-color);
+  color: var(--danger-color);
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-weight: bold;
+}
+
 @media (max-width: 768px) {
   .app-layout {
     flex-direction: column;
@@ -168,23 +179,48 @@ h2 {
     width: 100%;
     height: auto;
     position: relative;
-    padding: 1rem;
+    padding: 1rem 0;
     border-right: none;
     border-bottom: 1px solid var(--surface-border);
   }
   .sidebar .brand {
+    flex-direction: row !important;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 1rem;
+    padding: 0 1rem;
+    text-align: left;
+  }
+  .sidebar .brand span:first-child {
+    font-size: 1.4rem;
   }
   .sidebar ul {
     flex-direction: row;
-    overflow-x: auto;
-    padding-bottom: 0.5rem;
+    flex-wrap: nowrap;
+    overflow-x: scroll;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 1rem 0.5rem 1rem;
+    scrollbar-width: none;
+  }
+  .sidebar ul::-webkit-scrollbar {
+    display: none;
   }
   .sidebar li {
     white-space: nowrap;
+    flex-shrink: 0;
+    padding: 0.6rem 1rem;
+    font-size: 0.95rem;
+  }
+  .logout-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    margin-top: 0;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
   }
   .main-content {
     margin-left: 0;
-    padding: 1.5rem;
+    padding: 1rem;
   }
 }
