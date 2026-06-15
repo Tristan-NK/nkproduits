@@ -16,6 +16,10 @@ function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // --- HORS-LOGIN STATES ---
+  const [vendeuseName, setVendeuseName] = useState(localStorage.getItem('nkstore-vendeuse-name') || '');
+  const [tempVendeuseName, setTempVendeuseName] = useState('');
+  const [logFilter, setLogFilter] = useState('ALL');
+
   const [newLotName, setNewLotName] = useState('');
   const [newModels, setNewModels] = useState([{ id: Date.now(), name: '', quantity: '1', buyPrice: '', sellPrice: '' }]);
   const [selectedStockLotId, setSelectedStockLotId] = useState('');
@@ -90,10 +94,11 @@ function App() {
 
   // Log Action Helper
   const logAction = async (action_type, description) => {
+    const authorName = role === 'ADMIN' ? 'ADMIN' : (vendeuseName || 'VENDEUSE');
     await supabase.from('logs').insert([{
       action_type,
       description,
-      author: role
+      author: authorName
     }]);
   };
 
@@ -108,9 +113,24 @@ function App() {
           {/* VENDEUSE */}
           <div className="glass-panel" style={{textAlign: 'center', width: '300px'}}>
             <h2>👩‍💼 Vendeuse</h2>
-            <p style={{fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '2rem'}}>Accès limité à la gestion du stock et aux nouveaux arrivages.</p>
+            <p style={{fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '1.5rem'}}>Accès limité à la gestion du stock et aux nouveaux arrivages.</p>
+            <input 
+              type="text" 
+              placeholder="Votre prénom ou surnom" 
+              value={tempVendeuseName} 
+              onChange={e => setTempVendeuseName(e.target.value)} 
+              style={{width: '100%', padding: '0.75rem', marginBottom: '1rem', borderRadius: '0.5rem', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--surface-border)', color: 'white', textAlign: 'center'}}
+            />
             <button 
-              onClick={() => { setRole('VENDEUSE'); localStorage.setItem('nkstore-role', 'VENDEUSE'); setActiveTab('catalogue'); }}
+              onClick={() => { 
+                if (!tempVendeuseName.trim()) { alert("Veuillez entrer votre prénom."); return; }
+                const name = tempVendeuseName.trim();
+                setVendeuseName(name);
+                localStorage.setItem('nkstore-vendeuse-name', name);
+                setRole('VENDEUSE'); 
+                localStorage.setItem('nkstore-role', 'VENDEUSE'); 
+                setActiveTab('catalogue'); 
+              }}
               style={{width: '100%', padding: '1rem', background: 'var(--accent-color)', color: 'white', border: 'none', borderRadius: '0.5rem', cursor: 'pointer', fontWeight: 'bold'}}
             >
               Connexion Libre
@@ -322,7 +342,7 @@ function App() {
         <div className="brand" style={{display: 'flex', flexDirection: 'column'}}>
           <span>NK'<span style={{color:'var(--accent-color)'}}>STORE</span></span>
           <span style={{fontSize: '0.8rem', color: role === 'ADMIN' ? 'var(--danger-color)' : 'var(--text-secondary)', fontWeight: 'normal', marginTop:'5px'}}>
-            Connecté en : {role === 'ADMIN' ? 'Admin 👑' : 'Vendeuse 👩‍💼'}
+            Connecté en : {role === 'ADMIN' ? 'Admin 👑' : `Vendeuse (${vendeuseName}) 👩‍💼`}
           </span>
         </div>
         <ul>
@@ -638,13 +658,29 @@ function App() {
         {role === 'ADMIN' && (
           <div className={`view-section ${activeTab !== 'logs' ? 'hidden-screen' : ''}`}>
              <header style={{marginBottom: '2rem'}}>
-              <h1>Historique des Mouvements</h1>
-              <p style={{color: 'var(--text-secondary)'}}>Suivez toutes les actions réalisées en boutique.</p>
+              <h1>Historique & Équipe</h1>
+              <p style={{color: 'var(--text-secondary)'}}>Consultez toutes les actions et filtrez par vendeur.</p>
             </header>
+
+            <div style={{marginBottom: '1rem', display: 'flex', gap: '1rem', alignItems: 'center'}}>
+              <label style={{color: 'var(--text-secondary)'}}>Filtrer par Vendeur :</label>
+              <select 
+                value={logFilter} 
+                onChange={e => setLogFilter(e.target.value)}
+                style={{padding: '0.5rem', borderRadius: '0.5rem', background: 'var(--bg-color)', border: '1px solid var(--surface-border)', color: 'white', minWidth: '150px'}}
+              >
+                <option value="ALL">Toute l'équipe</option>
+                <option value="ADMIN">Admin Uniquement</option>
+                {[...new Set(logs.filter(l => l.author !== 'ADMIN').map(l => l.author))].map(seller => (
+                  <option key={seller} value={seller}>{seller}</option>
+                ))}
+              </select>
+            </div>
+
             <div className="glass-panel" style={{maxHeight: '600px', overflowY: 'auto'}}>
               {logs.length === 0 ? <p>Aucun mouvement pour le moment.</p> : (
                 <ul style={{listStyle: 'none', padding: 0}}>
-                  {logs.map(log => (
+                  {(logFilter === 'ALL' ? logs : logs.filter(l => l.author === logFilter)).map(log => (
                     <li key={log.id} style={{padding: '1rem', borderBottom: '1px solid var(--surface-border)', display: 'flex', flexDirection: 'column', gap: '0.25rem'}}>
                       <div style={{display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)', fontSize: '0.85rem'}}>
                         <span>{new Date(log.created_at).toLocaleString('fr-FR')}</span>
