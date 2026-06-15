@@ -15,6 +15,15 @@ function App() {
   const [activeTab, setActiveTab] = useState('stock'); // default tab
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // --- HORS-LOGIN STATES ---
+  const [newLotName, setNewLotName] = useState('');
+  const [newModels, setNewModels] = useState([{ id: Date.now(), name: '', quantity: '1', buyPrice: '', sellPrice: '' }]);
+  const [selectedStockLotId, setSelectedStockLotId] = useState('');
+  const [selectedLotIdExp, setSelectedLotIdExp] = useState('');
+  const [expensesForm, setExpensesForm] = useState({ customs: '', ads: '', transport: '', other: '' });
+  const [selectedLotIdPrice, setSelectedLotIdPrice] = useState('');
+  const [editPrices, setEditPrices] = useState({});
+
   // Auth Listener
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -165,9 +174,6 @@ function App() {
   // --- ACTIONS ---
 
   // 1. ADD LOT
-  const [newLotName, setNewLotName] = useState('');
-  const [newModels, setNewModels] = useState([{ id: Date.now(), name: '', quantity: '1', buyPrice: '', sellPrice: '' }]);
-
   const updateNewModel = (id, field, value) => {
     setNewModels(newModels.map(m => m.id === id ? { ...m, [field]: value } : m));
   };
@@ -209,7 +215,6 @@ function App() {
   };
 
   // 2. STOCK UPDATE
-  const [selectedStockLotId, setSelectedStockLotId] = useState('');
   const updateStock = async (lotId, modelId, modelName, lotName, currentSold, maxQty, change) => {
     let newSold = currentSold + change;
     if (newSold < 0) newSold = 0;
@@ -234,9 +239,6 @@ function App() {
   };
 
   // 3. EXPENSES UPDATE (ADMIN ONLY)
-  const [selectedLotIdExp, setSelectedLotIdExp] = useState('');
-  const [expensesForm, setExpensesForm] = useState({ customs: '', ads: '', transport: '', other: '' });
-
   const loadExpensesToForm = (lotId) => {
     setSelectedLotIdExp(lotId);
     const lot = lots.find(l => l.id === lotId);
@@ -263,9 +265,6 @@ function App() {
   };
 
   // 3.5 EDIT BUY PRICES (ADMIN ONLY)
-  const [selectedLotIdPrice, setSelectedLotIdPrice] = useState('');
-  const [editPrices, setEditPrices] = useState({});
-
   const loadPricesToForm = (lotId) => {
     setSelectedLotIdPrice(lotId);
     const lot = lots.find(l => l.id === lotId);
