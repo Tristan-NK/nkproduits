@@ -5,6 +5,7 @@ import './App.css';
 
 function App() {
   const [role, setRole] = useState(localStorage.getItem('nkstore-role') || null);
+  const [adminEmail, setAdminEmail] = useState('tristannkoghe7@gmail.com');
   const [pin, setPin] = useState('');
   
   const [lots, setLots] = useState([]);
@@ -112,8 +113,15 @@ function App() {
             <h2>👑 Administrateur</h2>
             <p style={{fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '1rem'}}>Accès complet (Bénéfices, Dépenses, Historique).</p>
             <input 
+              type="email" 
+              placeholder="Email Admin" 
+              value={adminEmail} 
+              onChange={(e) => setAdminEmail(e.target.value)}
+              style={{width: '100%', padding: '0.75rem', marginBottom: '0.5rem', textAlign: 'center', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--surface-border)', color: 'white', borderRadius: '0.5rem'}}
+            />
+            <input 
               type="password" 
-              placeholder="Code PIN / Mot de passe" 
+              placeholder="Mot de passe" 
               value={pin} 
               onChange={(e) => setPin(e.target.value)}
               style={{width: '100%', padding: '0.75rem', marginBottom: '1rem', textAlign: 'center', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--surface-border)', color: 'white', borderRadius: '0.5rem'}}
@@ -121,7 +129,7 @@ function App() {
             <button 
               onClick={async () => {
                 const { data, error } = await supabase.auth.signInWithPassword({
-                  email: 'tristannkoghe7@gmail.com',
+                  email: adminEmail,
                   password: pin
                 });
                 
