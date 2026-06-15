@@ -1,0 +1,124 @@
+.excel-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.excel-table th, .excel-table td {
+  padding: 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.excel-table th {
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.excel-table input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid transparent;
+  color: white !important;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  font-family: inherit;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.excel-table input:focus {
+  background: rgba(0, 0, 0, 0.4);
+  border-color: var(--accent-color);
+  outline: none;
+}
+
+.expenses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.expense-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.expense-input-group label {
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.expense-input-group input {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--surface-border);
+  color: white !important;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+}
+
+.expense-input-group input:focus {
+  border-color: var(--danger-color);
+  outline: none;
+}
+
+.add-row-btn {
+  background: transparent;
+  color: var(--accent-color);
+  border: 1px dashed var(--accent-color);
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0.75rem;
+}
+
+.add-row-btn:hover {
+  background: rgba(59, 130, 246, 0.1);
+  box-shadow: none;
+}
+
+/* ---- STYLES D'IMPRESSION (PDF) ---- */
+@media print {
+  @page { margin: 1.5cm; }
+  
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .print-only { display: block !important; }
+  .no-print { display: none !important; }
+
+  .glass-panel {
+    background: white !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin-bottom: 2rem !important;
+    page-break-inside: avoid;
+  }
+
+  .stat-card {
+    border: 1px solid #ccc !important;
+    background: white !important;
+    color: black !important;
+  }
+
+  * {
+    color: black !important;
+    text-shadow: none !important;
+  }
+
+  h2, h3 { color: black !important; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+
+  /* Mettre en valeur le bénéfice net en gras sur le PDF */
+  .profit-positive { color: black !important; font-weight: bold; }
+  .profit-negative { color: black !important; font-weight: bold; }
+}
